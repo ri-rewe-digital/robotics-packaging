@@ -1,35 +1,13 @@
 from geometry import Point, Cuboid, Space
-from bin import Container
 from typing import List
-
-
-class ContainerList:
-    def __init__(self, specification: Cuboid):
-        self.specification = specification
-        self.containers = List[Container]
-
-    def __getitem__(self, item)->Container:
-        return self.containers[item]
-
-    def opened_containers(self):
-       return self.containers
-
-    def __sizeof__(self):
-        return len(self.containers)
-
-    def open_new_container(self)->int:
-        self.containers.append(Container(self.specification))
-        return len(self.containers)
-
-    def reset(self):
-        self.containers = []
-        # self.size = 0
+from placer import SpaceFilter
+import numpy as np
 
 class Container:
     def __init__(self, specification: Cuboid):
         self.specification = specification
         self.used_volume: int = 0
-        self.empty_space_list= [Space.from_placement(Point(0,0,0),specification)]
+        self.empty_space_list= [Space.from_placement(Point.new_origin(),specification)]
         self.spaces_intersects= []#:int
         self.new_empty_spaces = []#Space
         self.orientations = []#Cuboid
@@ -51,16 +29,8 @@ class Container:
                         best_ems = ems
         return best_ems
 
-    def
-    new_space_filter(space: Space):
-        dimensions = space.dimensions()
-        v = space.volume()
-        return min(dimensions) >= min_dimension and v >= min_volume
 
-
-
-
-
+    def allocate_space(self, space: Space,  new_space_filter: SpaceFilter):
         self.used_volume += space.volume()
         self.spaces_intersects.clear()
         spaces_intersects = (item for item, ems in enumerate(self.empty_space_list) if ems.intersects(space))
@@ -68,65 +38,58 @@ class Container:
         self.new_empty_spaces.clear()
         for i in self.spaces_intersects:
             ems = self.empty_space_list[i]
-            # Is this supposed to be intersection?
+            # TODO RB: Is this supposed to be intersection?
             union = ems.union(space)
-            difference_process(ems, union, self.new_empty_spaces, |s| {new_space_filter(s)})
+            ems.difference_process(union, self.new_empty_spaces, new_space_filter)
 
-        for &i in self.spaces_intersects.iter().rev() {
-        self.empty_space_list.swap_remove(i);
-        }
-        self.empty_space_list.retain(|s| new_space_filter(s));
+        #TODO RB: what is swap_remove?
+        for i in reversed(self.spaces_intersects):
+            self.empty_space_list.swap_remove(i)
 
-        for (i, this) in self.new_empty_spaces.iter().enumerate() {
-        let overlapped = self.new_empty_spaces
-        .iter()
-        .enumerate()
-        .any(|(j, other)| i != j && other.contains(this));
-        if !overlapped {
-        self.empty_space_list.push(*this);
-        }
-        }
+        #TODO RB: what does retain do?
+        #self.empty_space_list.retain(|s| new_space_filter(s))
 
 
-    def allocate_space(self, space: Space, new_space_filter):{
-        where
-            F: FnMut(&Space) -> bool, {
+        for (i, empty_space) in enumerate(self.new_empty_spaces):
+            for j, other_empty_space in enumerate(self.new_empty_spaces):
+                if i != j and other_empty_space.contains(empty_space)
+            overlapped = for j, other_empty_space in enumerate(self.new_empty_spaces) if i != j and other_empty_space.contains(empty_space)
+            .iter()
+            .enumerate()
+            #TODO RB: does rust.any return a list or the first match?
+            .any(|(j, other_empty_space)| i != j and other_empty_space.contains(empty_space));
+            if not overlapped :
+                self.empty_space_list.append(empty_space);
 
 
 
-        }
+    def reset(self):
+        self.used_volume = 0
+        self.orientations.clear()
+        self.new_empty_spaces.clear()
+        self.spaces_intersects.clear()
+        self.empty_space_list.clear()
+        self.empty_space_list.append(Space.from_placement(Point.new_origin(), self.specification))
 
-        #[inline]
-        fn reset(&mut self) {
-            self.used_volume = 0;
-            self.orientations.borrow_mut().clear();
-            self.new_empty_spaces.clear();
-            self.spaces_intersects.clear();
-            self.empty_space_list.clear();
-            self.empty_space_list.push(Space::from_placement(&Point::new(0, 0, 0), &self.spec))
-        }
-    }
 
-    #[inline]
-    def difference_process(self, this: Space, other: Space, new_spaces: List[Space], new_space_filter)
-        where F: FnMut(&Space) -> bool, {
-            let (sb, su, ob, ou) = (
-                &this.bottom_left,
-                &this.upper_right,
-                &other.bottom_left,
-                &other.upper_right,
-            );
-        let spaces = [Space::new(*sb, Point::new(ob.x, su.y, su.z)),
-                        Space::new(Point::new(ou.x, sb.y, sb.z), *su),
-                        Space::new(*sb, Point::new(su.x, ob.y, su.z)),
-                        Space::new(Point::new(sb.x, ou.y, sb.z), *su),
-                        Space::new(*sb, Point::new(su.x, su.y, ob.z)),
-                        Space::new(Point::new(sb.x, sb.y, ou.z), *su)];
+class ContainerList:
+    def __init__(self, specification: Cuboid):
+        self.specification = specification
+        self.containers = List[Container]
 
-        let spaces = spaces
-                 .iter()
-                 .filter(|ns| ns.width().min(ns.depth()).min(ns.height()) != 0 && new_space_filter(ns));
-        for space in spaces {
-            new_spaces.push(*space);
-        }
-    }
+    def __getitem__(self, item)->Container:
+        return self.containers[item]
+
+    def opened_containers(self):
+        return self.containers
+
+    def __sizeof__(self):
+        return len(self.containers)
+
+    def open_new_container(self)->int:
+        self.containers.append(Container(self.specification))
+        return len(self.containers)
+
+    def reset(self):
+        self.containers = []
+        # self.size = 0
