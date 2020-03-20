@@ -1,10 +1,20 @@
 import numpy as np
 from typing import List
-
+import math
+import copy
+from placer import SpaceFilter
 
 class Point:
     def __init__(self, coordinates: np.array):
         self.coords = coordinates
+
+    @staticmethod
+    def new_origin():
+        return Point.from_scalars()
+
+    @staticmethod
+    def from_scalars(x=0, y=0, z=0):
+        return Point(np.array([x, y, z]))
 
     def squared_distance_from(self, other):
         distance = self.coords - other.coords
@@ -124,6 +134,31 @@ class Space:
     def __str__(self):
         return str(self.bottom_left) + ", " + str(self.upper_right)
 
+    def create_new_spaces(self, other_space, new_empty_spaces, new_space_filter: SpaceFilter):
+        sb, su, ob, ou = self.bottom_left, self.upper_right, other_space.bottom_left, other_space.upper_right
+
+        spaces = [
+            Space(copy.copy(sb), Point.from_scalars(ob[0], su[1], su[2])),
+            Space(Point.from_scalars(ou[0], sb[1], sb[2]), copy.copy(su)),
+            Space(copy.copy(sb), Point.from_scalars(su[0], ob[1], su[2])),
+            Space(Point.from_scalars(sb[0], ou[1], sb[2]), copy.copy(su)),
+            Space(copy.copy(sb), Point.from_scalars(su[0], su[1], ob[2])),
+            Space(Point.from_scalars(sb[0], sb[1], ou[2]), copy.copy(su))
+        ]
+        new_empty_spaces.extend([space for space in spaces if min(space.dimensions()) > 0 and new_space_filter.is_valid(space)])
+
+
+
+class MinTest:
+    def __init__(self, volume):
+        self.volume = volume
+
+    def compare(self):
+        return self.volume
+
+    def __str__(self):
+        return str(self.volume)
+
 
 if __name__ == '__main__':
     a = Point(np.array([3, 7, 3]))
@@ -166,9 +201,23 @@ if __name__ == '__main__':
     print(s.union(s2))
     print(s.intersection(s2))
 
-    p = [a,b,d]
+    p = [a, b, d]
     r = []
-    test = (item for item, point in enumerate(p) if point.coords[2]==5 or point.coords[1]==2)
+    test = (item for item, point in enumerate(p) if point.coords[2] == 5 or point.coords[1] == 2)
     r.extend(test)
+    print(str(p[1:]))
     for t in r:
         print("Found: " + str(p[t]))
+
+    tests = [MinTest(3), MinTest(6), MinTest(2), MinTest(1)]
+    print(min(tests, key=lambda x: x.volume))
+    print([str(mt) for mt in tests[math.ceil(len(tests) / 2):]])
+    test_enum = [(index, score) for (index, score) in enumerate(tests)]
+    print("Sorted: enums")
+    test_enum.sort(key=lambda v: v[1].volume)
+
+    for mt in test_enum:
+        print(mt)
+
+    tests.clear()
+    print("size: " + str(len(tests)))
