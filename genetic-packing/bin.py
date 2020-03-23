@@ -12,6 +12,7 @@ class Container:
         self.new_empty_spaces = []  # Space
         self.orientations = []  # Cuboid
 
+    #DFTRC-2 Distance to the Front Top Right Corner
     def try_place_cuboid(self, cuboid: Cuboid) -> Space:
         max_dist = -1
         best_ems = None

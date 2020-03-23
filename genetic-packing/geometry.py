@@ -133,6 +133,7 @@ class Space:
     def __str__(self):
         return str(self.bottom_left) + ", " + str(self.upper_right)
 
+    # aka the "difference process"
     def create_new_spaces(self, other_space, new_empty_spaces, new_space_filter):
         sb, su, ob, ou = self.bottom_left, self.upper_right, other_space.bottom_left, other_space.upper_right
 

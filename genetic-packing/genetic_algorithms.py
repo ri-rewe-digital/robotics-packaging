@@ -1,37 +1,48 @@
 from random import random, randint
 
-from placer import InnerSolution
+import math
+
+from configuration import Parameters
+from placer import PlacementSolution
 import numpy as np
 
-Chromosome = []  # floats
+
+# Chromosome = []  # floats
+
+
+class Chromosome:
+    def __init__(self, number_of_boxes: int):
+        self.number_of_boxes = number_of_boxes
+        self.genes = []
+
+    def get_bps(self):
+        return self.genes[0:self.number_of_boxes]
+
+    def get_vbo(self):
+        return self.genes[self.number_of_boxes:]
+
+    def __getitem__(self, item):
+        return self.genes[item]
+
+    def __len__(self):
+        return self.number_of_boxes
+
+    def append(self, gene):
+        self.genes.append(gene)
+
+    def decode_orientation(self, box_idx, orientations):
+        # TODO RB: check for off-by-one
+        gene = self.genes[self.number_of_boxes + box_idx]
+        decoded_gene = math.ceil(gene * len(orientations))
+        orientation = orientations[max(decoded_gene, 1) - 1]
+        return orientation
 
 
 class InnerChromosome:
-    def __init__(self, chromosome: Chromosome, solution: InnerSolution, fitness: float):
+    def __init__(self, chromosome: Chromosome, solution: PlacementSolution, fitness: float):
         self.fitness = fitness
         self.solution = solution
         self.chromosome = chromosome
-
-
-class Parameters:
-    population_size: int
-    num_elites: int
-    num_mutants: int
-    inherit_elite_probability: float
-    max_generations: int
-    max_generations_no_improvement: int
-
-
-class Decoder:
-
-    def decode_chromosome(self, individual: Chromosome) -> InnerSolution:
-        pass
-
-    def fitness_of(self, solution: InnerSolution) -> float:
-        pass
-
-    def reset(self):
-        pass
 
 
 class Generator:
@@ -55,7 +66,7 @@ class Solver:
         self.population = []  # Vec<InnerChromosome<D::Solution>>
         self.population1 = []  # Vec<InnerChromosome<D::Solution>>
 
-    def solve(self) -> InnerSolution:
+    def solve(self) -> PlacementSolution:
         generation = 0
         generations_no_improvement = 0
         self.init_first_generation()
@@ -74,7 +85,7 @@ class Solver:
         return self.population[0].solution
 
     def crossover(self, elite: Chromosome, non_elite: Chromosome) -> Chromosome:
-        offspring = []
+        offspring = Chromosome(len(elite))
         for i in range(0, len(elite)):
             prob = random()
             if prob <= self.parameters.inherit_elite_probability:
