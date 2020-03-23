@@ -1,5 +1,5 @@
 from bin import ContainerList
-from genetic_algorithms import Chromosome
+from chromosome import Chromosome
 from geometry import Cuboid, Space, SpaceFilter
 from typing import List
 import math

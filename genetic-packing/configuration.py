@@ -23,7 +23,7 @@ class Parameters:
         population_size = self.population_factor * num_items
         num_elites = int(self.elites_percentage * float(population_size))
         num_mutants = int(self.mutants_percentage * float(population_size))
-        return Parameters(
+        return GAParameters(
             population_size,
             num_elites,
             num_mutants,
@@ -41,3 +41,14 @@ class Parameters:
             self.max_generations,
             self.max_generations_no_improvement,
         )
+
+
+class GAParameters():
+    def __init__(self, population_size, num_elites, num_mutants, inherit_elite_probability, max_generations,
+                 max_generations_no_improvement):
+        self.max_generations = max_generations
+        self.inherit_elite_probability = inherit_elite_probability
+        self.max_generations_no_improvement = max_generations_no_improvement
+        self.num_mutants = num_mutants
+        self.num_elites = num_elites
+        self.population_size = population_size

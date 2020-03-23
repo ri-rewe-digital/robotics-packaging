@@ -1,11 +1,11 @@
-from genetic_algorithms import Chromosome
+from chromosome import Chromosome
 from geometry import Cuboid
 from placer import PlacementSolution, Placer
 
 
 class Decoder:
 
-    def decode_chromosome(self, individual: Chromosome) -> PlacementSolution:
+    def decode_chromosome(self, individual) -> PlacementSolution:
         pass
 
     def fitness_of(self, solution: PlacementSolution) -> float:

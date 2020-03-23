@@ -3,6 +3,7 @@ import copy
 import math
 import numpy as np
 
+
 class Point:
     def __init__(self, coordinates: np.array):
         self.coords = coordinates
@@ -48,6 +49,9 @@ class Point:
     def __str__(self):
         return str(self.coords)
 
+    def __repr__(self):
+        return str(self.coords)
+
 
 class Cuboid:
     def __init__(self, dimensions: Point):
@@ -61,6 +65,9 @@ class Cuboid:
         # space.width() >= self.width && space.height() >= self.height && space.depth() >= self.depth
 
     def __str__(self):
+        return str(self.dimensions)
+
+    def __repr__(self):
         return str(self.dimensions)
 
     def get_rotation_permutations(self):
@@ -168,8 +175,10 @@ class MinTest:
     def __str__(self):
         return str(self.volume)
 
+
 def first_true(iterable, default=False, pred=None):
     return next(filter(pred, iterable), default)
+
 
 if __name__ == '__main__':
     a = Point(np.array([3, 7, 3]))
