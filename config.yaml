@@ -1,0 +1,6 @@
+population_factor: 30
+elites_percentage: 0.10
+mutants_percentage: 0.15
+inherit_elite_probability: 0.70
+max_generations: 200
+max_generations_no_improvement: 5
