@@ -29,21 +29,12 @@ class InnerPlacement:
         self.box_index = box_index
 
 
-class SpaceFilter:
-    def __init__(self, min_dimension, min_volume):
-        self.min_dimension = min_dimension
-        self.min_volume = min_volume
-
-    def is_valid(self, new_space: Space) -> bool:
-        return min(new_space.dimensions()) >= self.min_dimension and new_space.volume() >= self.min_volume
-
-
 class Placer:
     def __init__(self, boxes: List[ProductBox], container_spec: Cuboid, bps, orientations):
         self.boxes = boxes  # [ProductBox]
         self.bins = ContainerList(container_spec)
-        self.bps = []  # Vec<(usize, f32)>
-        self.orientations = []  # Vec<Cuboid>
+        self.bps = bps  # Vec<(usize, f32)>
+        self.orientations = orientations  # Vec<Cuboid>
 
     def place_boxes(self, chromosome: Chromosome) -> InnerSolution:
         placements = []
@@ -101,7 +92,7 @@ class Placer:
     def reset(self):
         self.bins.reset()
         self.bps.clear()
-        self.orientations.borrow_mut().clear()
+        self.orientations.clear()
 
     def min_dimension_and_volume(self, remain_bps) -> (int, int):
         (min_d, min_v) = (MAX_INT, MAX_INT)

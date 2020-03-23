@@ -1,8 +1,7 @@
-import numpy as np
-from typing import List
-import math
 import copy
-from placer import SpaceFilter
+
+import math
+import numpy as np
 
 class Point:
     def __init__(self, coordinates: np.array):
@@ -134,7 +133,7 @@ class Space:
     def __str__(self):
         return str(self.bottom_left) + ", " + str(self.upper_right)
 
-    def create_new_spaces(self, other_space, new_empty_spaces, new_space_filter: SpaceFilter):
+    def create_new_spaces(self, other_space, new_empty_spaces, new_space_filter):
         sb, su, ob, ou = self.bottom_left, self.upper_right, other_space.bottom_left, other_space.upper_right
 
         spaces = [
@@ -145,8 +144,17 @@ class Space:
             Space(copy.copy(sb), Point.from_scalars(su[0], su[1], ob[2])),
             Space(Point.from_scalars(sb[0], sb[1], ou[2]), copy.copy(su))
         ]
-        new_empty_spaces.extend([space for space in spaces if min(space.dimensions()) > 0 and new_space_filter.is_valid(space)])
+        new_empty_spaces.extend(
+            [space for space in spaces if min(space.dimensions()) > 0 and new_space_filter.is_valid(space)])
 
+
+class SpaceFilter:
+    def __init__(self, min_dimension, min_volume):
+        self.min_dimension = min_dimension
+        self.min_volume = min_volume
+
+    def is_valid(self, new_space: Space) -> bool:
+        return min(new_space.dimensions()) >= self.min_dimension and new_space.volume() >= self.min_volume
 
 
 class MinTest:
@@ -159,6 +167,8 @@ class MinTest:
     def __str__(self):
         return str(self.volume)
 
+def first_true(iterable, default=False, pred=None):
+    return next(filter(pred, iterable), default)
 
 if __name__ == '__main__':
     a = Point(np.array([3, 7, 3]))
@@ -219,5 +229,18 @@ if __name__ == '__main__':
     for mt in test_enum:
         print(mt)
 
-    tests.clear()
-    print("size: " + str(len(tests)))
+    print(a)
+    print(b)
+    a, b = b, a
+    print(a)
+    print(b)
+
+    result = []
+    for (i, test_a) in enumerate(tests):
+        overlapped = first_true(enumerate(tests),
+                                pred=lambda j_and_b: i != j_and_b[0] and j_and_b[1].volume < test_a.volume)
+        if overlapped:
+            result.append(test_a)
+
+    for test_ in result:
+        print(test_)
