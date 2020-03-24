@@ -47,7 +47,7 @@ def read_csv_data(file="data/product_boxes.csv"):
             count = int(row['count'])
             index = 0
             while index < count:
-                product_boxes.append(Cuboid(Point.from_scalars(row['width'], row['depth'], row['height'])))
+                product_boxes.append(Cuboid(Point.from_scalars(int(row['width']), int(row['depth']), int(row['height']))))
                 index += 1
     return product_boxes
 

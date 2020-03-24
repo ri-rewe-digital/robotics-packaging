@@ -1,12 +1,12 @@
 from random import random, randint
 
 import math
+import numpy as np
 
 from chromosome import Chromosome
-from configuration import Parameters, GAParameters
+from configuration import GAParameters
 from encode import Decoder
 from placer import PlacementSolution
-import numpy as np
 
 
 # Chromosome = []  # floats
@@ -28,13 +28,15 @@ class RandGenerator(Generator):
         self.length = length
 
     def generate_individual(self) -> []:
-        return np.random.random(self.length).tolist()
+        result = Chromosome(math.floor(self.length*0.5))
+        result.set_genes(np.random.random(self.length).tolist())
+        return result
 
 
 class Solver:
-    def __init__(self, generator: Generator, decoder_factory, parameters: GAParameters):
+    def __init__(self, generator: Generator, decoder: Decoder, parameters: GAParameters):
         self.generator = generator
-        self.decoder_factory = decoder_factory
+        self.decoder = decoder
         self.parameters = parameters
         self.population = []  # Vec<InnerChromosome<D::Solution>>
         self.population1 = []  # Vec<InnerChromosome<D::Solution>>
@@ -73,30 +75,25 @@ class Solver:
         elite = self.population[randint(0, elite_size)]
         non_elite = self.population[elite_size + randint(0, non_elite_size)]
 
-        return (elite.chromosome, non_elite.chromosome)
-
-    def sort_population(self, population):  # Vec<InnerChromosome<D::Solution>>
-        pass
-        # TODO: RB: check with vec
-        # population.sort_unstable_by(|a, b| a.fitness.partial_cmp(b.fitness).unwrap())
+        return elite.chromosome, non_elite.chromosome
 
     @staticmethod
-    def decode_chromosome(decoder: Decoder, chromosome: Chromosome) -> InnerChromosome:
-        solution = decoder.decode_chromosome(chromosome)
-        fitness = decoder.fitness_of(solution)
-        decoder.reset()
+    def sort_population(population):  # Vec<InnerChromosome<D::Solution>>
+        population.sort(key=lambda c: c.fitness)
+
+    def decode_chromosome(self, chromosome: Chromosome) -> InnerChromosome:
+        solution = self.decoder.decode_chromosome(chromosome)
+        fitness = self.decoder.fitness_of(solution)
+        self.decoder.reset()
 
         return InnerChromosome(chromosome, solution, fitness)
 
     def init_first_generation(self):
-        decoder = self.decoder_factory.decoder()
-        generator = self.generator
         for i in range(0, self.parameters.population_size):
-            self.population.append(self.decode_chromosome(decoder, generator.generate_individual()))
-        self.sort_population(self.population)
+            self.population.append(self.decode_chromosome(self.generator.generate_individual()))
+        Solver.sort_population(self.population)
 
     def evolve_new_generation(self):
-        decoder = self.decoder_factory.decoder()
         num_elites = self.parameters.num_elites
         num_mutants = self.parameters.num_mutants
         num_offsprings = self.parameters.population_size - num_elites - num_mutants
@@ -108,14 +105,14 @@ class Solver:
         # generate mutants from generator.
         for _ in range(0, num_mutants):
             mutant = self.generator.generate_individual()
-            mutant = self.decode_chromosome(decoder, mutant)
+            mutant = self.decode_chromosome(mutant)
             self.population1.append(mutant)
 
         # crossover offsprings.
         for _ in range(0, num_offsprings):
             (elite, non_elite) = self.pickup_parents_for_crossover()
             offspring = self.crossover(elite, non_elite)
-            self.population1.append(self.decode_chromosome(decoder, offspring))
+            self.population1.append(self.decode_chromosome(offspring))
 
         # sort the new generation and swap backend vec.
         self.sort_population(self.population1)

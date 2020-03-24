@@ -3,6 +3,14 @@ from geometry import Cuboid
 from placer import PlacementSolution, Placer
 
 
+class ProductBox:
+    def __init__(self, cuboid: Cuboid):
+        self.cuboid = cuboid
+        self.smallest_dimension: int = min(cuboid.dimensions)
+        self.volume: int = cuboid.volume()
+
+
+
 class Decoder:
 
     def decode_chromosome(self, individual) -> PlacementSolution:
@@ -17,9 +25,9 @@ class Decoder:
 
 class GADecoder(Decoder):
     def __init__(self, product_boxes, bin_specification: Cuboid):
-        self.product_boxes = product_boxes
+        self.product_boxes = [ProductBox(pb) for pb in product_boxes]
+        self.placer = Placer(self.product_boxes, bin_specification)
         self.bin_volume = bin_specification.volume()
-        self.placer = Placer(product_boxes, bin_specification)
         self.bin_specification = bin_specification
 
     def decode_chromosome(self, individual: Chromosome) -> PlacementSolution:
@@ -30,3 +38,5 @@ class GADecoder(Decoder):
 
     def reset(self):
         self.placer.reset()
+
+

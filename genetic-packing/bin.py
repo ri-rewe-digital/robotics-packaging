@@ -1,5 +1,3 @@
-from typing import List
-
 from geometry import Point, Cuboid, Space, SpaceFilter
 
 
@@ -37,14 +35,15 @@ class Container:
     def allocate_space(self, space: Space, new_space_filter: SpaceFilter):
         self.used_volume += space.volume()
         self.spaces_intersects.clear()
-        spaces_intersects = (item for item, ems in enumerate(self.empty_space_list) if ems.intersects(space))
+        spaces_intersects = [item for item, ems in enumerate(self.empty_space_list) if ems.intersects(space)]
         self.spaces_intersects.extend(spaces_intersects)
         self.new_empty_spaces.clear()
         for i in self.spaces_intersects:
             ems = self.empty_space_list[i]
             # TODO RB: Is this supposed to be intersection?
-            union = ems.union(space)
-            ems.difference_process(union, self.new_empty_spaces, new_space_filter)
+            # union = ems.union(space)
+            intersection = ems.intersection(space)
+            ems.create_new_spaces(intersection, self.new_empty_spaces, new_space_filter)
 
         for i in reversed(self.spaces_intersects):
             self.empty_space_list.pop(i)
@@ -72,7 +71,7 @@ class Container:
 class ContainerList:
     def __init__(self, specification: Cuboid):
         self.specification = specification
-        self.containers = List[Container]
+        self.containers = [] #List[Container]
 
     def __getitem__(self, item) -> Container:
         return self.containers[item]
@@ -85,7 +84,7 @@ class ContainerList:
 
     def open_new_container(self) -> int:
         self.containers.append(Container(self.specification))
-        return len(self.containers)
+        return len(self.containers) - 1
 
     def reset(self):
         self.containers = []
