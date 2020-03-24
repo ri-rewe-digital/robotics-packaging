@@ -7,7 +7,6 @@ class Container:
         self.used_volume: int = 0
         self.empty_space_list = [Space.from_placement(Point.new_origin(), specification)]
         self.spaces_intersects = []  #:int
-        self.new_empty_spaces = []  # Space
         self.orientations = []  # Cuboid
 
     #DFTRC-2 Distance to the Front Top Right Corner
@@ -37,13 +36,13 @@ class Container:
         self.spaces_intersects.clear()
         spaces_intersects = [item for item, ems in enumerate(self.empty_space_list) if ems.intersects(space)]
         self.spaces_intersects.extend(spaces_intersects)
-        self.new_empty_spaces.clear()
+        new_empty_spaces = []
         for i in self.spaces_intersects:
             ems = self.empty_space_list[i]
             # TODO RB: Is this supposed to be intersection?
             # union = ems.union(space)
             intersection = ems.intersection(space)
-            ems.create_new_spaces(intersection, self.new_empty_spaces, new_space_filter)
+            ems.create_new_spaces(intersection, new_empty_spaces, new_space_filter)
 
         for i in reversed(self.spaces_intersects):
             self.empty_space_list.pop(i)
@@ -53,16 +52,15 @@ class Container:
                                  new_space_filter.is_valid(filtered_space)]
         # self.empty_space_list.retain(|s| new_space_filter(s))
 
-        for (i, empty_space) in enumerate(self.new_empty_spaces):
-            overlapped = Container.first_true(enumerate(self.new_empty_spaces),
+        for (i, empty_space) in enumerate(new_empty_spaces):
+            overlapped = Container.first_true(enumerate(new_empty_spaces),
                                               pred=lambda j_and_other_space: i != j_and_other_space[0] and j_and_other_space[1].contains(empty_space))
-            if overlapped:
+            if not overlapped:
                 self.empty_space_list.append(empty_space)
 
     def reset(self):
         self.used_volume = 0
         self.orientations.clear()
-        self.new_empty_spaces.clear()
         self.spaces_intersects.clear()
         self.empty_space_list.clear()
         self.empty_space_list.append(Space.from_placement(Point.new_origin(), self.specification))

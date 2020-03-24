@@ -9,6 +9,8 @@ class ProductBox:
         self.smallest_dimension: int = min(cuboid.dimensions)
         self.volume: int = cuboid.volume()
 
+    def __repr__(self):
+        return self.cuboid.__repr__()
 
 
 class Decoder:
