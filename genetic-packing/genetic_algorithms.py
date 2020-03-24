@@ -1,3 +1,4 @@
+from copy import copy
 from random import random, randint
 
 import math
@@ -61,7 +62,7 @@ class Solver:
 
     def crossover(self, elite: Chromosome, non_elite: Chromosome) -> Chromosome:
         offspring = Chromosome(len(elite))
-        for i in range(0, len(elite)):
+        for i in range(0, len(elite)*2):
             prob = random()
             if prob <= self.parameters.inherit_elite_probability:
                 offspring.append(elite[i])
@@ -82,7 +83,9 @@ class Solver:
         population.sort(key=lambda c: c.fitness)
 
     def decode_chromosome(self, chromosome: Chromosome) -> InnerChromosome:
+
         solution = self.decoder.decode_chromosome(chromosome)
+        print("all boxes placed: {}".format(solution))
         fitness = self.decoder.fitness_of(solution)
         self.decoder.reset()
 
@@ -100,7 +103,7 @@ class Solver:
 
         # copy elites to next generation.
         for elite in self.population[0:num_elites]:
-            self.population1.append(elite.clone())
+            self.population1.append(copy(elite))
 
         # generate mutants from generator.
         for _ in range(0, num_mutants):
@@ -118,6 +121,4 @@ class Solver:
         self.sort_population(self.population1)
         # TODO: we can reuse the memory of individual's vector inside population vector.
         self.population.clear()
-        # TODO RB: lookop mem::swap
         self.population, self.population1 = self.population1, self.population
-    # mem::swap(&mut self.population, &mut self.population1);

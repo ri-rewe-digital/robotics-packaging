@@ -3,6 +3,8 @@ from chromosome import Chromosome
 from geometry import Cuboid, Space, SpaceFilter
 import math
 
+from plott import plot_placements
+
 MAX_INT = 2E63 - 1
 
 
@@ -12,12 +14,27 @@ class PlacementSolution:
         self.least_load = least_load
         self.placements = placements  # Vec<ProductPlacements>
 
+    def __repr__(self):
+        return "number of bins: {}, least_load: {}, placements ({}): {}".format(
+            self.num_bins,
+            self.least_load,
+            len(self.placements),
+            self.placements
+        )
+
 
 class ProductPlacement:
     def __init__(self, space: Space, bin_number: int, box_index: int):
         self.space = space
         self.bin_number = bin_number
         self.box_index = box_index
+
+    def __repr__(self):
+        return "space: {}, bin: {}, box: {}".format(
+            self.space,
+            self.bin_number,
+            self.box_index
+        )
 
 
 class Placer:
@@ -44,6 +61,7 @@ class Placer:
 
             self.bins[fit_bin].allocate_space(placement_space, SpaceFilter(min_dimension, min_volume))
             placements.append(ProductPlacement(placement_space, fit_bin, box_idx))
+            #plot_placements(self.bins[fit_bin], placements, False)
 
         new_bins = self.bins.opened_containers()
         num_bins = len(new_bins)

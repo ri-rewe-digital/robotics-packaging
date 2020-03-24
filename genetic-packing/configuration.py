@@ -20,7 +20,7 @@ class Parameters:
         )
 
     def get_ga_params(self, num_items: int):
-        population_size = self.population_factor * num_items
+        population_size = num_items # self.population_factor * num_items
         num_elites = int(self.elites_percentage * float(population_size))
         num_mutants = int(self.mutants_percentage * float(population_size))
         return GAParameters(

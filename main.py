@@ -47,7 +47,8 @@ def read_csv_data(file="data/product_boxes.csv"):
             count = int(row['count'])
             index = 0
             while index < count:
-                product_boxes.append(Cuboid(Point.from_scalars(int(row['width']), int(row['depth']), int(row['height']))))
+                product_boxes.append(
+                    Cuboid(Point.from_scalars(int(row['width']), int(row['depth']), int(row['height']))))
                 index += 1
     return product_boxes
 
@@ -61,7 +62,6 @@ def main():
     delivery_bins = solve_packing_problem(parameters, product_boxes, delivery_bin_spec)
     for i, db in enumerate(delivery_bins):
         print("deliverybox: {}, with products: {}".format(i, db))
-
 
 
 if __name__ == '__main__':

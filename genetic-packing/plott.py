@@ -3,24 +3,36 @@ import numpy as np
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
 from bin import Container
-from geometry import Cuboid, Point
+from geometry import Cuboid, Point, Space
 
 box_color = 'blue'
 product_color = 'red'
-space_color = 'yellow'
+empty_color = 'yellow'
 
 
-def plot(container):
+def create_graphics():
     g = plt.axes(projection='3d')
-    draw_cube(g, container.specification, box_color)
     g.set_xlabel('X')
     g.set_ylabel('Y')
     g.set_zlabel('Z')
-    g.set_xlim3d(0, container.specification.dimensions[0] + 10)
-    g.set_ylim3d(0, container.specification.dimensions[1] + 10)
-    g.set_zlim3d(0, container.specification.dimensions[2] + 10)
+    return g
 
-    plt.show()
+
+def scale_axis_for_container(g, container_bin):
+    g.set_xlim3d(0, container_bin.specification.dimensions[0] + 10)
+    g.set_ylim3d(0, container_bin.specification.dimensions[1] + 10)
+    g.set_zlim3d(0, container_bin.specification.dimensions[2] + 10)
+
+
+def plot_container(container_bin):
+    g = create_graphics()
+    draw_container(g, container_bin)
+    scale_axis_for_container(g, container_bin)
+    return g
+
+
+def draw_container(g, container_bin):
+    draw_cube(g, container_bin.specification, box_color)
 
 
 def create_vertices_from_points(o0, u0):
@@ -51,7 +63,33 @@ def draw_cube(g, cuboid, col):
     g.add_collection3d(Poly3DCollection(verts, facecolors=col, linewidths=0.2, edgecolors='r', alpha=.10))
 
 
+def draw_space(g, space, col):
+    verts = create_vertices_from_points(space.bottom_left.coords, space.upper_right.coords)
+    g.add_collection3d(Poly3DCollection(verts, facecolors=col, linewidths=0.2, edgecolors='r', alpha=.10))
+
+
+def draw_placement(g, product_placement, color):
+    draw_space(g, product_placement.space, color)
+
+
+def plot_placements(container_bin, placements, plot_spaces=False):
+    g = plot_container(container_bin)
+    for i, product_placement in enumerate(placements):
+        if product_placement:
+            draw_placement(g, product_placement, ((float(i+1)/len(placements)),0,0,0))
+    if plot_spaces:
+        for empty_space in container_bin.empty_space_list:
+            if empty_space:
+                draw_space(g, empty_space, empty_color)
+    plt.show()
+
+
 if __name__ == '__main__':
     spec = Cuboid(Point.from_scalars(30, 30, 30))
-    container = Container(spec)
-    plot(container)
+    container_ = Container(spec)
+    g = plot_container(container_)
+    b = Point(np.array([5, 5, 5]))
+    d = Point(np.array([3, 2, 3]))
+    s = Space(d, b)
+    draw_space(g, s, product_color)
+    plt.show()
