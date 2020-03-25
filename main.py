@@ -5,6 +5,7 @@ from configuration import Parameters
 from encode import GADecoder
 from genetic_algorithms import RandGenerator, Solver
 from geometry import Cuboid, Point, Space
+from plott import plot_placements, plot_solution
 
 
 class SolutionPlacement:
@@ -13,21 +14,24 @@ class SolutionPlacement:
         self.box_id = box_id
 
 
+
+
+
 def solve_packing_problem(parameters, product_boxes, delivery_bin_specification):
     generator = RandGenerator(len(product_boxes) * 2)
     ga_params = parameters.get_ga_params(len(product_boxes))
     solver = Solver(generator, GADecoder(product_boxes, delivery_bin_specification), ga_params)
     solution = solver.solve()
 
-    delivery_bins = []
+    delivery_bins = dict()
     for inner_placement in solution.placements:
-        idx = inner_placement.bin_no
+        idx = inner_placement.bin_number
         space = inner_placement.space
-        item_idx = inner_placement.box_idx
-        if delivery_bins[idx] is None:
+        item_idx = inner_placement.box_index
+        if not delivery_bins or delivery_bins[idx] is None:
             delivery_bins[idx] = []
         delivery_bins[idx].append(SolutionPlacement(space, item_idx))
-
+    plot_solution(delivery_bin_specification, delivery_bins, False)
     return delivery_bins
 
 

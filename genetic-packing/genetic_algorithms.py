@@ -73,8 +73,11 @@ class Solver:
     def pickup_parents_for_crossover(self) -> (Chromosome, Chromosome):
         elite_size = self.parameters.num_elites
         non_elite_size = self.parameters.population_size - elite_size
-        elite = self.population[randint(0, elite_size)]
-        non_elite = self.population[elite_size + randint(0, non_elite_size)]
+        elite = self.population[randint(0, elite_size-1)]
+        non_elite_id = elite_size + randint(0, non_elite_size-1)
+        if non_elite_id >= len(self.population):
+            print("WHAT?")
+        non_elite = self.population[non_elite_id]
 
         return elite.chromosome, non_elite.chromosome
 

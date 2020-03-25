@@ -1,5 +1,8 @@
+from random import randint, random
+
 import matplotlib.pyplot as plt
 import numpy as np
+import time
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
 from bin import Container
@@ -12,22 +15,23 @@ empty_color = 'yellow'
 
 def create_graphics():
     g = plt.axes(projection='3d')
+    g.view_init(elev=30., azim=60)
     g.set_xlabel('X')
     g.set_ylabel('Y')
     g.set_zlabel('Z')
     return g
 
 
-def scale_axis_for_container(g, container_bin):
-    g.set_xlim3d(0, container_bin.specification.dimensions[0] + 10)
-    g.set_ylim3d(0, container_bin.specification.dimensions[1] + 10)
-    g.set_zlim3d(0, container_bin.specification.dimensions[2] + 10)
+def scale_axis_for_container(g, container_spec):
+    g.set_xlim3d(0, container_spec.dimensions[0] + 10)
+    g.set_ylim3d(0, container_spec.dimensions[1] + 10)
+    g.set_zlim3d(0, container_spec.dimensions[2] + 10)
 
 
 def plot_container(container_bin):
     g = create_graphics()
     draw_container(g, container_bin)
-    scale_axis_for_container(g, container_bin)
+    scale_axis_for_container(g, container_bin.specification)
     return g
 
 
@@ -60,7 +64,7 @@ def create_vertices(cuboid):
 
 def draw_cube(g, cuboid, col):
     verts = create_vertices(cuboid)
-    g.add_collection3d(Poly3DCollection(verts, facecolors=col, linewidths=0.2, edgecolors='r', alpha=.10))
+    g.add_collection3d(Poly3DCollection(verts, facecolors=col, linewidths=0.2, edgecolors='b', alpha=.10))
 
 
 def draw_space(g, space, col):
@@ -72,11 +76,24 @@ def draw_placement(g, product_placement, color):
     draw_space(g, product_placement.space, color)
 
 
+def plot_solution(container_bin, delivery_bins, param):
+    g = create_graphics()
+    draw_cube(g, container_bin, box_color)
+    scale_axis_for_container(g, container_bin)
+
+    for del_bin in delivery_bins:
+        for i, placement_solution in enumerate(delivery_bins[del_bin]):
+            draw_space(g, placement_solution.space,
+                       ((float(i + 1) / len(delivery_bins[del_bin])),
+                        float(placement_solution.box_id) / len(delivery_bins[del_bin]),
+                        float(placement_solution.box_id) / len(delivery_bins[del_bin]), 1))
+    plt.show()
+
 def plot_placements(container_bin, placements, plot_spaces=False):
     g = plot_container(container_bin)
     for i, product_placement in enumerate(placements):
         if product_placement:
-            draw_placement(g, product_placement, ((float(i+1)/len(placements)),0,0,0))
+            draw_placement(g, product_placement, ((float(i + 1) / len(placements)), 0, 0, 0))
     if plot_spaces:
         for empty_space in container_bin.empty_space_list:
             if empty_space:
@@ -88,6 +105,7 @@ if __name__ == '__main__':
     spec = Cuboid(Point.from_scalars(30, 30, 30))
     container_ = Container(spec)
     g = plot_container(container_)
+    g.view_init(elev=30., azim=60)
     b = Point(np.array([5, 5, 5]))
     d = Point(np.array([3, 2, 3]))
     s = Space(d, b)
