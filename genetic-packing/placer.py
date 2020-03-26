@@ -1,9 +1,6 @@
-from bin import ContainerList
+from container import ContainerList
 from chromosome import Chromosome
 from geometry import Cuboid, Space, SpaceFilter
-import math
-
-from plott import plot_placements
 
 MAX_INT = 2E63 - 1
 
@@ -61,7 +58,7 @@ class Placer:
 
             self.bins[fit_bin].allocate_space(placement_space, SpaceFilter(min_dimension, min_volume))
             placements.append(ProductPlacement(placement_space, fit_bin, box_idx))
-            #plot_placements(self.bins[fit_bin], placements, False)
+            #plot_placements(self.bins[fit_bin], placements, True)
 
         new_bins = self.bins.opened_containers()
         num_bins = len(new_bins)
