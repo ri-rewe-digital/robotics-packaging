@@ -141,7 +141,7 @@ class Space:
         return str(self.bottom_left) + ", " + str(self.upper_right)
 
     # aka the "difference process"
-    def create_new_spaces(self, other_space, new_empty_spaces, new_space_filter):
+    def create_new_spaces(self, other_space, new_space_filter):
         sb, su, ob, ou = self.bottom_left, self.upper_right, other_space.bottom_left, other_space.upper_right
 
         spaces = [
@@ -152,8 +152,7 @@ class Space:
             Space(copy.copy(sb), Point.from_scalars(su[0], su[1], ob[2])),
             Space(Point.from_scalars(sb[0], sb[1], ou[2]), copy.copy(su))
         ]
-        new_empty_spaces.extend(
-            [space for space in spaces if min(space.dimensions()) > 0 and new_space_filter.is_valid(space)])
+        return [space for space in spaces if min(space.dimensions()) > 0 and new_space_filter.is_valid(space)]
 
 
 class SpaceFilter:

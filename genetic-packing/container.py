@@ -42,7 +42,7 @@ class Container:
             # TODO RB: Is this supposed to be intersection?
             # union = ems.union(space)
             intersection = ems.intersection(space)
-            ems.create_new_spaces(intersection, new_empty_spaces, new_space_filter)
+            new_empty_spaces.extend(ems.create_new_spaces(intersection, new_empty_spaces))
 
         for i in reversed(self.spaces_intersects):
             self.empty_space_list.pop(i)
