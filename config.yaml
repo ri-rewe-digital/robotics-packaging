@@ -1,6 +1,7 @@
-population_factor: 30
+population_factor: 3
 elites_percentage: 0.10
 mutants_percentage: 0.15
 inherit_elite_probability: 0.70
 max_generations: 200
 max_generations_no_improvement: 5
+number_of_threads: 10

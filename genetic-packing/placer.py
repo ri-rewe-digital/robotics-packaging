@@ -1,26 +1,8 @@
-from bin import ContainerList
+from container import ContainerList
 from chromosome import Chromosome
 from geometry import Cuboid, Space, SpaceFilter
-import math
-
-from plott import plot_placements
 
 MAX_INT = 2E63 - 1
-
-
-class PlacementSolution:
-    def __init__(self, num_bins: int, least_load: int, placements):
-        self.num_bins = num_bins
-        self.least_load = least_load
-        self.placements = placements  # Vec<ProductPlacements>
-
-    def __repr__(self):
-        return "number of bins: {}, least_load: {}, placements ({}): {}".format(
-            self.num_bins,
-            self.least_load,
-            len(self.placements),
-            self.placements
-        )
 
 
 class ProductPlacement:
@@ -37,76 +19,66 @@ class ProductPlacement:
         )
 
 
+class PlacementSolution:
+    def __init__(self, num_bins: int, least_load: int, placements):
+        self.num_bins = num_bins
+        self.least_load = least_load
+        self.placements = placements  # Vec<ProductPlacements>
+
+    def fitness_for(self, bin_volume):
+        return float(self.num_bins) + (float(self.least_load) / float(bin_volume))
+
+    def __repr__(self):
+        return "number of bins: {}, least_load: {}, placements ({}): {}".format(
+            self.num_bins,
+            self.least_load,
+            len(self.placements),
+            self.placements
+        )
+
+
 class Placer:
     def __init__(self, boxes: [], container_spec: Cuboid):
         self.boxes = boxes  # [ProductBox]
-        self.bins = ContainerList(container_spec)
-        self.bps = []  # Vec<(usize, f32)>
-        self.orientations = []  # Vec<Cuboid>
+        self.container_spec = container_spec
 
     def place_boxes(self, chromosome: Chromosome) -> PlacementSolution:
-        placements = []
         min_dimension, min_volume = MAX_INT, MAX_INT
+        placements = []
+        containers = ContainerList(self.container_spec)
+        bps = chromosome.calculate_box_packing_sequence()
+        for (bps_idx, box_genome) in enumerate(bps):
+            box_to_pack = self.boxes[box_genome.id]
 
-        self.calculate_bps(chromosome)
-        for (bps_idx, (box_idx, _)) in enumerate(self.bps):
-            box_to_pack = self.boxes[box_idx]
+            container_id, placement_space = containers.find_container_to_place(box_to_pack)
 
-            fit_bin, fit_space = self.find_bin_to_fit(box_to_pack)
-
-            placement_space = self.place_box(box_idx, chromosome, fit_space)
+            placement_space = self.__place_box(box_genome.id, chromosome, placement_space)
 
             if box_to_pack.smallest_dimension <= min_dimension or box_to_pack.volume <= min_volume:
-                min_dimension, min_volume = self.determine_remaining_min_dim_and_volume(self.bps[(bps_idx + 1):])
+                min_dimension, min_volume = self.__determine_remaining_min_dim_and_volume(bps[(bps_idx + 1):])
 
-            self.bins[fit_bin].allocate_space(placement_space, SpaceFilter(min_dimension, min_volume))
-            placements.append(ProductPlacement(placement_space, fit_bin, box_idx))
-            #plot_placements(self.bins[fit_bin], placements, False)
+            containers[container_id].allocate_new_empty_spaces(placement_space, SpaceFilter(min_dimension, min_volume))
+            placements.append(ProductPlacement(placement_space, container_id, box_genome.id))
+            # plot_placements(self.bins[fit_bin], placements, True)
 
-        new_bins = self.bins.opened_containers()
-        num_bins = len(new_bins)
-        least_load = min(new_bins, key=lambda b: b.used_volume).used_volume
-        return PlacementSolution(num_bins, least_load, placements)
+        new_containers = containers.opened_containers()
+        num_containers = len(new_containers)
+        least_load = min(new_containers, key=lambda b: b.used_volume).used_volume
+        return PlacementSolution(num_containers, least_load, placements)
 
-    def find_bin_to_fit(self, box_to_pack):
-        (fit_bin, fit_space) = (None, None)
-        for (i, current_bin) in enumerate(self.bins.opened_containers()):
-            if current_bin:
-                placement_space = current_bin.try_place_cuboid(box_to_pack.cuboid)
-                if placement_space is not None:
-                    fit_space = placement_space
-                    fit_bin = i
-                    break
-        if fit_bin is None:
-            fit_bin = self.bins.open_new_container()
-            fit_space = self.bins[fit_bin].empty_space_list[0]
-        return fit_bin, fit_space
-
-    def place_box(self, box_idx: int, chromosome: Chromosome, container_space: Space) -> Space:
+    def __place_box(self, box_idx: int, chromosome: Chromosome, container_space: Space) -> Space:
         cuboid = self.boxes[box_idx].cuboid
-
         orientations = cuboid.get_rotation_permutations()
         orientations = [o for o in orientations if o.can_fit_in(container_space)]
+
         orientation = chromosome.decode_orientation(box_idx, orientations)
 
         return Space.from_placement(container_space.origin(), orientation)
 
-    def reset(self):
-        self.bins.reset()
-        self.bps.clear()
-        self.orientations.clear()
-
-    def determine_remaining_min_dim_and_volume(self, remain_bps) -> (int, int):
+    def __determine_remaining_min_dim_and_volume(self, remain_bps) -> (int, int):
         (min_d, min_v) = (MAX_INT, MAX_INT)
-        for (box_idx, _) in remain_bps:
-            b = self.boxes[box_idx]
+        for box_genome in remain_bps:
+            b = self.boxes[box_genome.id]
             min_d = min(min_d, b.smallest_dimension)
             min_v = min(min_v, b.volume)
         return min_d, min_v
-
-    def calculate_bps(self, chromosome: Chromosome):
-        self.bps.clear()
-        self.bps = chromosome.get_box_packing_sequence()
-        # sort by score ascending.
-        self.bps.sort(key=lambda box: box[1])
-        # (|a, b| a.1.partial_cmp(b.1).unwrap())

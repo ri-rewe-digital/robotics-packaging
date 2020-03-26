@@ -1,27 +1,30 @@
+from random import random
+
+import math
+import numpy as np
+
 from chromosome import Chromosome
+from container import ProductBox
 from geometry import Cuboid
 from placer import PlacementSolution, Placer
 
 
-class ProductBox:
-    def __init__(self, cuboid: Cuboid):
-        self.cuboid = cuboid
-        self.smallest_dimension: int = min(cuboid.dimensions)
-        self.volume: int = cuboid.volume()
-
-    def __repr__(self):
-        return self.cuboid.__repr__()
+class IndividualSolution:
+    def __init__(self, chromosome: Chromosome, solution: PlacementSolution, fitness: float):
+        self.fitness = fitness
+        self.solution = solution
+        self.chromosome = chromosome
 
 
 class Decoder:
 
-    def decode_chromosome(self, individual) -> PlacementSolution:
-        pass
-
-    def fitness_of(self, solution: PlacementSolution) -> float:
+    def decode_individual(self, individual) -> IndividualSolution:
         pass
 
     def reset(self):
+        pass
+
+    def decode_population(self, individuals: []):
         pass
 
 
@@ -30,15 +33,42 @@ class GADecoder(Decoder):
         self.product_boxes = [ProductBox(pb) for pb in product_boxes]
         self.placer = Placer(self.product_boxes, bin_specification)
         self.bin_volume = bin_specification.volume()
-        self.bin_specification = bin_specification
 
-    def decode_chromosome(self, individual: Chromosome) -> PlacementSolution:
-        return self.placer.place_boxes(individual)
-
-    def fitness_of(self, solution: PlacementSolution) -> float:
-        return float(solution.num_bins) + (float(solution.least_load) / float(self.bin_volume))
+    def decode_individual(self, individual: Chromosome) -> IndividualSolution:
+        solution = self.placer.place_boxes(individual)
+        print("all boxes placed: {}".format(solution))
+        fitness = solution.fitness_for(self.bin_volume)
+        return IndividualSolution(individual, solution, fitness)
 
     def reset(self):
-        self.placer.reset()
+        pass  # self.placer.reset()
+
+    def decode_population(self, individuals: []):
+        population = []
+        for individual in individuals:
+            population.append(self.decode_individual(individual))
+        return population
 
 
+class Encoder:
+    def encode_individual(self) -> Chromosome:
+        pass
+
+    def encode_individuals(self, number_of_individuals):
+        pass
+
+
+class RandEncoder(Encoder):
+    def __init__(self, length: int):
+        self.length = length
+
+    def encode_individual(self) -> Chromosome:
+        result = Chromosome(math.floor(self.length * 0.5))
+        result.set_genes(np.random.random(self.length).tolist())
+        return result
+
+    def encode_individuals(self, number_of_individuals):
+        individuals = []
+        for i in range(0, number_of_individuals):
+            individuals.append(self.encode_individual())
+        return individuals

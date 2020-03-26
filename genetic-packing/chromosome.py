@@ -1,13 +1,21 @@
 import math
 
 
+class BoxGenom:
+    def __init__(self, box_id, score):
+        self.id = box_id
+        self.score = score
+
+
 class Chromosome:
     def __init__(self, number_of_boxes: int):
         self.number_of_boxes = number_of_boxes
         self.genes = []
 
-    def get_box_packing_sequence(self):
-        return [(index, score) for (index, score) in enumerate(self.genes[:self.number_of_boxes])]
+    def calculate_box_packing_sequence(self):
+        bps = [BoxGenom(index, score) for (index, score) in enumerate(self.genes[:self.number_of_boxes])]
+        bps.sort(key=lambda box: box.score)
+        return bps
 
     def get_vbo(self):
         return self.genes[self.number_of_boxes:]
@@ -16,7 +24,7 @@ class Chromosome:
         return self.genes[item]
 
     def __len__(self):
-        return self.number_of_boxes
+        return len(self.genes)
 
     def append(self, gene):
         self.genes.append(gene)
