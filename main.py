@@ -3,8 +3,8 @@ import yaml
 import csv
 
 from configuration import Parameters
-from encode import GADecoder
-from genetic_algorithms import RandGenerator, Solver
+from encode import GADecoder, RandEncoder
+from genetic_algorithms import Solver
 from geometry import Cuboid, Point, Space
 from plott import plot_placements, plot_solution
 
@@ -16,7 +16,7 @@ class SolutionPlacement:
 
 
 def solve_packing_problem(parameters, product_boxes, delivery_bin_specification):
-    generator = RandGenerator(len(product_boxes) * 2)
+    generator = RandEncoder(len(product_boxes) * 2)
     ga_params = parameters.get_ga_params(len(product_boxes))
     solver = Solver(generator, GADecoder(product_boxes, delivery_bin_specification), ga_params)
     solution = solver.solve()
