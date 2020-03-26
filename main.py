@@ -14,9 +14,6 @@ class SolutionPlacement:
         self.box_id = box_id
 
 
-
-
-
 def solve_packing_problem(parameters, product_boxes, delivery_bin_specification):
     generator = RandGenerator(len(product_boxes) * 2)
     ga_params = parameters.get_ga_params(len(product_boxes))
