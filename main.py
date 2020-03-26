@@ -14,6 +14,9 @@ class SolutionPlacement:
         self.space = space
         self.box_id = box_id
 
+    def __repr__(self):
+        return "id: {}, location: {}".format(self.box_id, self.space)
+
 
 def solve_packing_problem(parameters, product_boxes, delivery_bin_specification):
     generator = RandEncoder(len(product_boxes) * 2)
@@ -62,8 +65,8 @@ def main():
     print(product_boxes)
     delivery_bin_spec = Cuboid(Point.from_scalars(30, 30, 30))
     delivery_bins = solve_packing_problem(parameters, product_boxes, delivery_bin_spec)
-    for i, db in enumerate(delivery_bins):
-        print("deliverybox: {}, with products: {}".format(i, db))
+    for db in delivery_bins:
+        print("deliverybox: {}, with products: {}".format(db, delivery_bins[db]))
 
 
 if __name__ == '__main__':

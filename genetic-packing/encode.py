@@ -1,6 +1,3 @@
-import queue
-import threading
-
 import math
 import numpy as np
 
@@ -8,7 +5,6 @@ from chromosome import Chromosome
 from container import ProductBox
 from geometry import Cuboid
 from placer import PlacementSolution, Placer
-from threadz import PlacerThread
 
 
 class IndividualSolution:
