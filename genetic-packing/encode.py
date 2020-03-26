@@ -1,3 +1,6 @@
+import queue
+import threading
+
 import math
 import numpy as np
 
@@ -5,6 +8,7 @@ from chromosome import Chromosome
 from container import ProductBox
 from geometry import Cuboid
 from placer import PlacementSolution, Placer
+from threadz import PlacerThread
 
 
 class IndividualSolution:
@@ -22,6 +26,9 @@ class Decoder:
     def reset(self):
         pass
 
+    def initialize_first_generation(self, population_size, encoder):
+        pass
+
 
 class GADecoder(Decoder):
     def __init__(self, product_boxes, bin_specification: Cuboid):
@@ -36,7 +43,13 @@ class GADecoder(Decoder):
         return IndividualSolution(individual, solution, fitness)
 
     def reset(self):
-        pass #self.placer.reset()
+        pass  # self.placer.reset()
+
+    def initialize_first_generation(self, population_size, encoder):
+        population = []
+        for i in range(0, population_size):
+            population.append(self.decode_individual(encoder.encode_individual()))
+        return population
 
 
 class Encoder:

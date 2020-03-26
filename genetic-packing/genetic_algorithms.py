@@ -58,12 +58,11 @@ class Solver:
         return elite.chromosome, non_elite.chromosome
 
     @staticmethod
-    def sort_population(population):  # Vec<InnerChromosome<D::Solution>>
+    def sort_population(population):
         population.sort(key=lambda c: c.fitness)
 
     def init_first_generation(self):
-        for i in range(0, self.parameters.population_size):
-            self.population.append(self.decoder.decode_individual(self.encoder.encode_individual()))
+        self.population.extend(self.decoder.initialize_first_generation(self.parameters.population_size, self.encoder))
         Solver.sort_population(self.population)
 
     def evolve_new_generation(self):
@@ -88,7 +87,7 @@ class Solver:
             self.population1.append(self.decoder.decode_individual(offspring))
 
         # sort the new generation and swap backend vec.
-        self.sort_population(self.population1)
+        Solver.sort_population(self.population1)
         # TODO: we can reuse the memory of individual's vector inside population vector.
         self.population.clear()
         self.population, self.population1 = self.population1, self.population
