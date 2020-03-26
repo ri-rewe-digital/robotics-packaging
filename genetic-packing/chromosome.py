@@ -6,7 +6,7 @@ class Chromosome:
         self.number_of_boxes = number_of_boxes
         self.genes = []
 
-    def get_bps(self):
+    def get_box_packing_sequence(self):
         return [(index, score) for (index, score) in enumerate(self.genes[:self.number_of_boxes])]
 
     def get_vbo(self):
@@ -29,6 +29,3 @@ class Chromosome:
 
     def set_genes(self, genes: []):
         self.genes = genes[:]
-
-
-

@@ -106,11 +106,7 @@ class Placer:
 
     def calculate_bps(self, chromosome: Chromosome):
         self.bps.clear()
-        # TODO RB: again the .., is it an explode in rust?
-        bps = chromosome.get_bps()
-        # bps = [(index, score) for (index, score) in enumerate(chromosome[:math.floor(len(chromosome) / 2)])]
-        # bps = chromosome[..chromosome.len() / 2].iter().enumerate().map(|(i, score)| (i, score))
-        self.bps.extend(bps)
-        # sort by score
-        self.bps.sort(key=lambda box: box[1], reverse=True)
+        self.bps = chromosome.get_box_packing_sequence()
+        # sort by score ascending.
+        self.bps.sort(key=lambda box: box[1])
         # (|a, b| a.1.partial_cmp(b.1).unwrap())

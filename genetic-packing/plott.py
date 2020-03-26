@@ -69,7 +69,7 @@ def draw_cube(g, cuboid, col):
 
 def draw_space(g, space, col):
     verts = create_vertices_from_points(space.bottom_left.coords, space.upper_right.coords)
-    g.add_collection3d(Poly3DCollection(verts, facecolors=col, linewidths=0.2, edgecolors='r', alpha=.10))
+    g.add_collection3d(Poly3DCollection(verts, facecolors=col, linewidths=0.2, edgecolors='r', alpha=1))
 
 
 def draw_placement(g, product_placement, color):
