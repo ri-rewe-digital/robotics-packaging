@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
-import yaml
 import csv
+import timeit
+
+import yaml
 
 from configuration import Parameters
 from encode import GADecoder, RandEncoder
 from genetic_algorithms import Solver
 from geometry import Cuboid, Point, Space
-from plott import plot_placements, plot_solution
+from plott import plot_solution
+from threadz import MultithreadedGADecoder
 
 
 class SolutionPlacement:
@@ -18,21 +21,36 @@ class SolutionPlacement:
         return "id: {}, location: {}".format(self.box_id, self.space)
 
 
+def solve_multi(product_boxes, delivery_bin_specification, ga_params, generator):
+    multi_solver = Solver(generator, MultithreadedGADecoder(product_boxes, delivery_bin_specification,
+                                                            ga_params.number_of_threads), ga_params)
+    return multi_solver.solve()
+
+
+def solve_single(product_boxes, delivery_bin_specification, ga_params, generator):
+    multi_solver = Solver(generator, GADecoder(product_boxes, delivery_bin_specification), ga_params)
+    return multi_solver.solve()
+
+
 def solve_packing_problem(parameters, product_boxes, delivery_bin_specification):
     generator = RandEncoder(len(product_boxes) * 2)
     ga_params = parameters.get_ga_params(len(product_boxes))
-    solver = Solver(generator, GADecoder(product_boxes, delivery_bin_specification), ga_params)
-    solution = solver.solve()
+    solution = solve_multi(product_boxes, delivery_bin_specification, ga_params, generator)
+
+    # elapsed_time = timeit.timeit(solve_multi(product_boxes, delivery_bin_specification, ga_params, generator),number=1)
+    # print("execution time with threading: {}".format(elapsed_time))
 
     delivery_bins = dict()
-    for inner_placement in solution.placements:
-        idx = inner_placement.bin_number
-        space = inner_placement.space
-        item_idx = inner_placement.box_index
-        if not delivery_bins or delivery_bins[idx] is None:
-            delivery_bins[idx] = []
-        delivery_bins[idx].append(SolutionPlacement(space, item_idx))
-    plot_solution(delivery_bin_specification, delivery_bins, False)
+
+    if solution:
+        for inner_placement in solution.placements:
+            idx = inner_placement.bin_number
+            space = inner_placement.space
+            item_idx = inner_placement.box_index
+            if not delivery_bins or delivery_bins[idx] is None:
+                delivery_bins[idx] = []
+            delivery_bins[idx].append(SolutionPlacement(space, item_idx))
+        plot_solution(delivery_bin_specification, delivery_bins, False)
     return delivery_bins
 
 

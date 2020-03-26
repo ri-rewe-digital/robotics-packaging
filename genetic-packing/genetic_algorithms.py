@@ -62,7 +62,7 @@ class Solver:
         population.sort(key=lambda c: c.fitness)
 
     def init_first_generation(self):
-        self.population.extend(self.decoder.initialize_first_generation(self.parameters.population_size, self.encoder))
+        self.population.extend(self.decoder.decode_population(self.encoder.encode_individuals(self.parameters.population_size)))
         Solver.sort_population(self.population)
 
     def evolve_new_generation(self):
@@ -75,16 +75,15 @@ class Solver:
             self.population1.append(copy(elite))
 
         # generate mutants from generator.
-        for _ in range(0, num_mutants):
-            mutant = self.encoder.encode_individual()
-            mutant = self.decoder.decode_individual(mutant)
-            self.population1.append(mutant)
+        self.population1.extend(self.decoder.decode_population(self.encoder.encode_individuals(num_mutants)))
 
         # crossover offsprings.
+        offspring = []
         for _ in range(0, num_offsprings):
             (elite, non_elite) = self.pickup_parents_for_crossover()
-            offspring = self.crossover(elite, non_elite)
-            self.population1.append(self.decoder.decode_individual(offspring))
+            offspring.append( self.crossover(elite, non_elite))
+
+        self.population1.extend(self.decoder.decode_population(offspring))
 
         # sort the new generation and swap backend vec.
         Solver.sort_population(self.population1)

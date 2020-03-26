@@ -1,3 +1,5 @@
+from random import random
+
 import math
 import numpy as np
 
@@ -22,7 +24,7 @@ class Decoder:
     def reset(self):
         pass
 
-    def initialize_first_generation(self, population_size, encoder):
+    def decode_population(self, individuals: []):
         pass
 
 
@@ -41,10 +43,10 @@ class GADecoder(Decoder):
     def reset(self):
         pass  # self.placer.reset()
 
-    def initialize_first_generation(self, population_size, encoder):
+    def decode_population(self, individuals: []):
         population = []
-        for i in range(0, population_size):
-            population.append(self.decode_individual(encoder.encode_individual()))
+        for individual in individuals:
+            population.append(self.decode_individual(individual))
         return population
 
 
@@ -52,12 +54,21 @@ class Encoder:
     def encode_individual(self) -> Chromosome:
         pass
 
+    def encode_individuals(self, number_of_individuals):
+        pass
+
 
 class RandEncoder(Encoder):
     def __init__(self, length: int):
         self.length = length
 
-    def encode_individual(self) -> []:
+    def encode_individual(self) -> Chromosome:
         result = Chromosome(math.floor(self.length * 0.5))
         result.set_genes(np.random.random(self.length).tolist())
         return result
+
+    def encode_individuals(self, number_of_individuals):
+        individuals = []
+        for i in range(0, number_of_individuals):
+            individuals.append(self.encode_individual())
+        return individuals

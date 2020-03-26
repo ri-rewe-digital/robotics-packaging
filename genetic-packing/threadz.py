@@ -10,8 +10,10 @@ from placer import Placer
 
 
 class PlacerThread(threading.Thread):
-    def __init__(self, placer: Placer, individual_queue, queue_lock):
+    def __init__(self, id, decoder, placer: Placer, individual_queue, queue_lock):
         threading.Thread.__init__(self)
+        self.id = id
+        self.decoder = decoder
         self.placer = placer
         self.individual_queue = individual_queue
         self.solutions = []
@@ -28,31 +30,30 @@ class PlacerThread(threading.Thread):
             else:
                 self.queue_lock.release()
             if individual is not None:
-                solution = self.placer.place_boxes(individual)
-                fitness = solution.fitness_for(self.placer.container_spec.volume())
-                self.solutions.append(IndividualSolution(individual, solution, fitness))
-            time.sleep(1)
+                self.solutions.append(self.decoder.decode_individual(individual))
+
+            time.sleep(0.1)
 
 
 class MultithreadedGADecoder(GADecoder):
     def __init__(self, product_boxes, bin_specification: Cuboid, number_of_threads: int):
-        GADecoder.__init__(product_boxes, bin_specification)
+        GADecoder.__init__(self, product_boxes, bin_specification)
         self.number_of_threads = number_of_threads
 
-    def initialize_first_generation(self, population_size, encoder):
+    def decode_population(self, individuals):
         population = []
-        individual_queue = queue.Queue(population_size)
+        individual_queue = queue.Queue(len(individuals))
         thread_lock = threading.Lock()
         worker_threads = []
 
         for i in range(0, self.number_of_threads):
-            placer_thread = PlacerThread(self.placer, individual_queue, thread_lock)
+            placer_thread = PlacerThread(i, self, self.placer, individual_queue, thread_lock)
             placer_thread.start()
             worker_threads.append(placer_thread)
 
         thread_lock.acquire()
-        for i in range(0, population_size):
-            individual_queue.put(encoder.encode_individual())
+        for individual in individuals:
+            individual_queue.put(individual)
         thread_lock.release()
 
         while not individual_queue.empty():
@@ -64,4 +65,5 @@ class MultithreadedGADecoder(GADecoder):
             worker.join()
         for worker in worker_threads:
             population.extend(worker.solutions)
+        return population
         # population.append(self.decode_individual(encoder.encode_individual()))
