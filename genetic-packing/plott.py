@@ -5,7 +5,7 @@ import numpy as np
 import time
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
-from bin import Container
+from container import Container
 from geometry import Cuboid, Point, Space
 
 box_color = 'blue'
@@ -16,6 +16,7 @@ empty_color = 'yellow'
 def create_graphics():
     g = plt.axes(projection='3d')
     g.view_init(elev=30., azim=60)
+    g.mouse_init()
     g.set_xlabel('X')
     g.set_ylabel('Y')
     g.set_zlabel('Z')
@@ -99,6 +100,8 @@ def plot_placements(container_bin, placements, plot_spaces=False):
             if empty_space:
                 draw_space(g, empty_space, empty_color)
     plt.show()
+
+
 
 
 if __name__ == '__main__':
