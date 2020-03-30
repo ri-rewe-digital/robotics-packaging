@@ -7,9 +7,6 @@ from encode import Decoder, Encoder
 from placer import PlacementSolution
 
 
-# Chromosome = []  # floats
-
-
 class Solver:
     def __init__(self, generator: Encoder, decoder: Decoder, parameters: GAParameters):
         self.encoder = generator
