@@ -1,6 +1,5 @@
 import copy
 
-import math
 import numpy as np
 
 
@@ -108,18 +107,6 @@ class Space:
     def center(self) -> Point:
         return Point((self.bottom_left + self.upper_right).coords / 2.0)
 
-    # pub fn width(&self) -> i32 {
-    #    self.upper_right.x - self.bottom_left.x
-    # }
-
-    # pub fn depth(&self) -> i32 {
-    #    self.upper_right.z - self.bottom_left.z
-    # }
-
-    # pub fn height(&self) -> i32 {
-    #    self.upper_right.y - self.bottom_left.y
-    # }
-
     def contains(self, other) -> bool:
         return self.bottom_left.scalar_less_than(other.bottom_left) and \
                other.upper_right.scalar_less_than(self.upper_right)
@@ -162,94 +149,3 @@ class SpaceFilter:
 
     def is_valid(self, new_space: Space) -> bool:
         return min(new_space.dimensions()) >= self.min_dimension and new_space.volume() >= self.min_volume
-
-
-class MinTest:
-    def __init__(self, volume):
-        self.volume = volume
-
-    def compare(self):
-        return self.volume
-
-    def __str__(self):
-        return str(self.volume)
-
-
-def first_true(iterable, default=False, pred=None):
-    return next(filter(pred, iterable), default)
-
-
-if __name__ == '__main__':
-    a = Point(np.array([3, 7, 3]))
-    b = Point(np.array([5, 5, 5]))
-    print(a)
-    print(b)
-    print(a.scalar_less_than(b))
-    print(a.squared_distance_from(b))
-    print(a - b)
-    print(a + b)
-    print(a.minimum(b))
-    print(a.maximum(b))
-    print(a.prod())
-    print(b.prod())
-
-    print("swap0,1: " + str(a.swap(0, 1)))
-    print("swap1,2: " + str(a.swap(1, 2)))
-    print("swap0,2: " + str(a.swap(0, 2)))
-
-    c = Cuboid(Point(np.array([3, 5, 7])))
-    print(c)
-    print(c.volume())
-    cuboids = c.get_rotation_permutations()
-    for cu in cuboids:
-        print(cu)
-
-    d = Point(np.array([3, 2, 3]))
-    s = Space(d, b)
-    print(s)
-    s2 = Space.from_placement(d, c)
-    print(s2)
-
-    print(s.dimensions())
-    print(s.origin())
-    print(s.center())
-    print("s: " + str(s))
-    print("s2: " + str(s2))
-    print(s.contains(s2))
-    print(s.intersects(s2))
-    print(s.union(s2))
-    print(s.intersection(s2))
-
-    p = [a, b, d]
-    r = []
-    test = (item for item, point in enumerate(p) if point.coords[2] == 5 or point.coords[1] == 2)
-    r.extend(test)
-    print(str(p[1:]))
-    for t in r:
-        print("Found: " + str(p[t]))
-
-    tests = [MinTest(3), MinTest(6), MinTest(2), MinTest(1)]
-    print(min(tests, key=lambda x: x.volume))
-    print([str(mt) for mt in tests[math.ceil(len(tests) / 2):]])
-    test_enum = [(index, score) for (index, score) in enumerate(tests)]
-    print("Sorted: enums")
-    test_enum.sort(key=lambda v: v[1].volume)
-
-    for mt in test_enum:
-        print(mt)
-
-    print(a)
-    print(b)
-    a, b = b, a
-    print(a)
-    print(b)
-
-    result = []
-    for (i, test_a) in enumerate(tests):
-        overlapped = first_true(enumerate(tests),
-                                pred=lambda j_and_b: i != j_and_b[0] and j_and_b[1].volume < test_a.volume)
-        if overlapped:
-            result.append(test_a)
-
-    for test_ in result:
-        print(test_)

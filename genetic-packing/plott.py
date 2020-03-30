@@ -1,8 +1,5 @@
-from random import randint, random
-
 import matplotlib.pyplot as plt
 import numpy as np
-import time
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
 from container import Container

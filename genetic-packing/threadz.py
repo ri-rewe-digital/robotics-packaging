@@ -1,10 +1,9 @@
 import queue
 import threading
+
 import time
 
-from chromosome import Chromosome
-from encode import IndividualSolution, GADecoder
-from genetic_algorithms import Solver
+from encode import GADecoder
 from geometry import Cuboid
 from placer import Placer
 
