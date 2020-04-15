@@ -5,3 +5,4 @@ inherit_elite_probability: 0.70
 max_generations: 200
 max_generations_no_improvement: 5
 number_of_threads: 10
+delivery_bin_spec: [30, 30, 30]
