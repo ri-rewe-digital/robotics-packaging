@@ -3,9 +3,9 @@ import threading
 
 import time
 
-from encode import GADecoder
-from geometry import Cuboid
-from placer import Placer
+from genetic_packing.encode import GADecoder
+from genetic_packing.geometry import Cuboid
+from genetic_packing.placer import Placer
 
 
 class PlacerThread(threading.Thread):

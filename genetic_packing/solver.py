@@ -1,13 +1,13 @@
 from copy import copy
 from random import random, randint
 
-from chromosome import Chromosome
-from configuration import Parameters, GAParameters
-from encode import GADecoder, RandEncoder, Encoder, Decoder
-from geometry import Space
-from placer import PlacementSolution
-from threadz import MultithreadedGADecoder
-from plott import plot_solution
+from genetic_packing.chromosome import Chromosome
+from genetic_packing.configuration import Parameters, GAParameters
+from genetic_packing.encode import GADecoder, RandEncoder, Encoder, Decoder
+from genetic_packing.geometry import Space
+from genetic_packing.placer import PlacementSolution
+from genetic_packing.threadz import MultithreadedGADecoder
+from genetic_packing.plott import plot_solution
 
 
 class Solver:

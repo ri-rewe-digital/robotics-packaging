@@ -2,8 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
-from container import Container
-from geometry import Cuboid, Point, Space
+from genetic_packing.container import Container
+from genetic_packing.geometry import Cuboid, Point, Space
 
 box_color = 'blue'
 product_color = 'red'

@@ -1,4 +1,4 @@
-from geometry import Point, Cuboid, Space, SpaceFilter
+from genetic_packing.geometry import Point, Cuboid, Space, SpaceFilter
 
 
 class ProductBox:

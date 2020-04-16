@@ -3,9 +3,9 @@ import csv
 
 import yaml
 
-from configuration import Parameters
-from geometry import Cuboid, Point
-from solver import solve_packing_problem
+from genetic_packing.configuration import Parameters
+from genetic_packing.geometry import Cuboid, Point
+from genetic_packing.solver import solve_packing_problem
 
 
 def read_config(file="config.yaml"):

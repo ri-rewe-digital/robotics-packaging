@@ -1,6 +1,6 @@
 import numpy as np
 
-from geometry import Cuboid, Point
+from genetic_packing.geometry import Cuboid, Point
 
 
 class Parameters:

@@ -1,6 +1,6 @@
-from container import ContainerList
-from chromosome import Chromosome
-from geometry import Cuboid, Space, SpaceFilter
+from genetic_packing.container import ContainerList
+from genetic_packing.chromosome import Chromosome
+from genetic_packing.geometry import Cuboid, Space, SpaceFilter
 
 MAX_INT = 2E63 - 1
 

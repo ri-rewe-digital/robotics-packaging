@@ -1,10 +1,10 @@
 import math
 import numpy as np
 
-from chromosome import Chromosome
-from container import ProductBox
-from geometry import Cuboid
-from placer import PlacementSolution, Placer
+from genetic_packing.chromosome import Chromosome
+from genetic_packing.container import ProductBox
+from genetic_packing.geometry import Cuboid
+from genetic_packing.placer import PlacementSolution, Placer
 
 
 class IndividualSolution:
