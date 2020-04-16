@@ -1,22 +1,24 @@
+#!/usr/bin/env python3
 import actionlib
-import roslib
 import rospy
 import yaml
 from ri_packaging.msg import PackagingResult, PackagingGoal, PackagingAction
 from shape_msgs.msg import SolidPrimitive, geometry_msgs
 
+from configuration import Parameters
 from geometry import Cuboid, Point, Space
 from src.packaging_solver import solve_packing_problem, SolutionPlacement
 
-roslib.load_manifest('basics')
 
-
-def read_config(file="config.yaml"):
+def read_config(file="/home/rutger/ideaworkspace/ri/packaging/src/ri_packaging/src/config.yaml"):
     with open(file, 'r') as stream:
         try:
             return yaml.safe_load(stream)
         except yaml.YAMLError as exc:
             print(exc)
+
+def create_paramaters():
+    return Parameters.from_yaml(read_config())
 
 
 def decode_geometry_msg(request_geometries):
@@ -59,7 +61,7 @@ def solve(packaging_request: PackagingGoal):
         server.set_aborted(result, "Packaging aborted due to empty product-list")
         return
     product_boxes = decode_geometry_msg(geometry_message)
-    delivery_bins: dict = solve_packing_problem(parameters=read_config(), product_boxes=product_boxes)
+    delivery_bins: dict = solve_packing_problem(parameters=create_paramaters(), product_boxes=product_boxes)
     # TODO rb: think about feedback and preempt requests.
     # if server.is_preempt_requested():
     #     result.products_geometries = geometry_message
@@ -79,4 +81,5 @@ def solve(packaging_request: PackagingGoal):
 rospy.init_node('ri_packaging_action_server')
 server = actionlib.SimpleActionServer('packer', PackagingAction, solve, False)
 server.start()
+print("Packaging server started successfully. Now listening on 'packer' topic." )
 rospy.spin()

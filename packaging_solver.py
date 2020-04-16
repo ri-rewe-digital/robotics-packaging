@@ -44,5 +44,5 @@ def solve_packing_problem(parameters: Parameters, product_boxes: []) -> dict:
             if not delivery_bins or delivery_bins[idx] is None:
                 delivery_bins[idx] = []
             delivery_bins[idx].append(SolutionPlacement(space, item_idx))
-        plot_solution(ga_params.delivery_bin_spec, delivery_bins, False)
+        # plot_solution(ga_params.delivery_bin_spec, delivery_bins, False)
     return delivery_bins
