@@ -5,7 +5,7 @@ import yaml
 
 from configuration import Parameters
 from geometry import Cuboid, Point
-from src.packaging_solver import solve_packing_problem
+from solver import solve_packing_problem
 
 
 def read_config(file="config.yaml"):
