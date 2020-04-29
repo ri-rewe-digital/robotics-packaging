@@ -1,12 +1,12 @@
 # robotics-packing
-Packing logic for place/packig problem. 
+Packing logic for place/packing problem. 
 
 This implementation is based on the paper 'A biased random key genetic algorithm for 2D and 3D bin packing problems' by J.Goncalves and M. Resende.
 This module integrates into the ri-robotics ros architecture by supplying a packing-action-server.
 
 Start-scripts are found in the 'bin' directory, for non-ros developers a main file exists.
 
-####NON-Ros Start in the console
+#### NON-Ros Start in the console
 Be sure your `PYTHONPATH` is set correctly
 ```
 $ cd to_your_checkout
@@ -20,7 +20,7 @@ For *non-ros* development, requirements are found in the requirements.txt
 ```
 your_checkout$ pip3 install -r requirements.txt
 ```
-####ROS
+#### ROS
 A launch file is supplied, you can use it to start the action server as a node.
 For your convenience an action client is supplied as well, you can start it by setting the parameter `run_client`
 ```
@@ -29,11 +29,11 @@ your_checkout$ roslaunch ri_packing packing.launch run_client:=true
 for *ros* development, all requirements are configured int the package.xml as well as the setup.py. 
 *Do not alter your `PYTHONPATH`*
 
-##Developers
+## Developers
 
 Entrypoint into the packing algorithm is the solver.py file. More specifically: solver.solve_packing_problem
 
-####Short-Overview
+#### Short-Overview
 * _Solver_: Responsible for population management. Starting at generation 'zero' it creates new generations according to the papers logic.
 * _Placer_: Manages the containers and the products therein. It uses a placement strategy to pack the delivery bins. It also triggers available space calculations in side the containers.
 * _PlacementStrategy_: Is defined in the configuration and instantiated in the PlacementFactory accordingly.
