@@ -1,9 +1,8 @@
 import math
+
 import numpy as np
 
 from genetic_packing.chromosome import Chromosome
-from genetic_packing.container import ProductBox
-from genetic_packing.geometry import Cuboid
 from genetic_packing.placer import PlacementSolution, Placer
 
 
@@ -19,33 +18,25 @@ class Decoder:
     def decode_individual(self, individual) -> IndividualSolution:
         pass
 
-    def reset(self):
-        pass
-
     def decode_population(self, individuals: []):
         pass
 
 
 class GADecoder(Decoder):
-    def __init__(self, product_boxes, bin_specification: Cuboid):
-        self.product_boxes = [ProductBox(pb) for pb in product_boxes]
-        self.placer = Placer(self.product_boxes, bin_specification)
-        self.bin_volume = bin_specification.volume()
+    def __init__(self, placer: Placer):
+        self.placer = placer
 
     def decode_individual(self, individual: Chromosome) -> IndividualSolution:
         solution = self.placer.place_boxes(individual)
         print("all boxes placed: {}".format(solution))
-        fitness = solution.fitness_for(self.bin_volume)
+        fitness = solution.fitness_for(self.placer.get_target_bin_volume())
         return IndividualSolution(individual, solution, fitness)
 
-    def reset(self):
-        pass  # self.placer.reset()
-
     def decode_population(self, individuals: []):
-        population = []
+        solutions = []
         for individual in individuals:
-            population.append(self.decode_individual(individual))
-        return population
+            solutions.append(self.decode_individual(individual))
+        return solutions
 
 
 class Encoder:

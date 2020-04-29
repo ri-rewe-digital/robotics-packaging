@@ -132,12 +132,12 @@ class Space:
         sb, su, ob, ou = self.bottom_left, self.upper_right, other_space.bottom_left, other_space.upper_right
 
         spaces = [
-            Space(copy.copy(sb), Point.from_scalars(ob[0], su[1], su[2])),
-            Space(Point.from_scalars(ou[0], sb[1], sb[2]), copy.copy(su)),
-            Space(copy.copy(sb), Point.from_scalars(su[0], ob[1], su[2])),
-            Space(Point.from_scalars(sb[0], ou[1], sb[2]), copy.copy(su)),
-            Space(copy.copy(sb), Point.from_scalars(su[0], su[1], ob[2])),
-            Space(Point.from_scalars(sb[0], sb[1], ou[2]), copy.copy(su))
+            Space(copy.copy(sb), Point.from_scalars(ob[0], su[1], su[2])),#left space
+            Space(Point.from_scalars(ou[0], sb[1], sb[2]), copy.copy(su)),#right space
+            Space(copy.copy(sb), Point.from_scalars(su[0], ob[1], su[2])),#front space
+            Space(Point.from_scalars(sb[0], ou[1], sb[2]), copy.copy(su)),#back space
+            Space(copy.copy(sb), Point.from_scalars(su[0], su[1], ob[2])),#bottom space
+            Space(Point.from_scalars(sb[0], sb[1], ou[2]), copy.copy(su)) #top space
         ]
         return [space for space in spaces if min(space.dimensions()) > 0 and new_space_filter.is_valid(space)]
 

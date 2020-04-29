@@ -3,12 +3,11 @@ import csv
 
 import yaml
 
-from genetic_packing.configuration import Parameters
 from genetic_packing.geometry import Cuboid, Point
 from genetic_packing.solver import solve_packing_problem
 
 
-def read_config(file="config.yaml"):
+def read_config(file="cfg/packing_config.yaml"):
     with open(file, 'r') as stream:
         try:
             return yaml.safe_load(stream)
@@ -31,11 +30,11 @@ def read_csv_data(file="data/product_boxes.csv"):
 
 
 def main():
-    parameters = Parameters.from_yaml(read_config())
+    parameters = read_config()
     print(parameters)
     product_boxes = read_csv_data()
     print(product_boxes)
-    delivery_bins = solve_packing_problem(parameters, product_boxes)
+    delivery_bins = solve_packing_problem(parameters, product_boxes, True)
     for db in delivery_bins:
         print("deliverybox: {}, with products: {}".format(db, delivery_bins[db]))
 

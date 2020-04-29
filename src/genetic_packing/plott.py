@@ -87,6 +87,7 @@ def plot_solution(container_bin, delivery_bins, param):
                         float(placement_solution.box_id) / len(delivery_bins[del_bin]), 1))
     plt.show()
 
+
 def plot_placements(container_bin, placements, plot_spaces=False):
     g = plot_container(container_bin)
     for i, product_placement in enumerate(placements):
@@ -97,8 +98,6 @@ def plot_placements(container_bin, placements, plot_spaces=False):
             if empty_space:
                 draw_space(g, empty_space, empty_color)
     plt.show()
-
-
 
 
 if __name__ == '__main__':

@@ -1,0 +1,27 @@
+# This is an action definition file, which has three parts: the goal, the
+# result, and the feedback.
+#
+# Part 1: the goal, to be sent by the client
+#
+# The list of boundingboxes represent the products
+shape_msgs/SolidPrimitive[] products_geometries
+---
+# Part 2: the result, to be sent by the server upon completion
+#
+# The locations to put the boxes
+geometry_msgs/Point[] locations
+
+# the boxes in place order
+shape_msgs/SolidPrimitive[] products_geometries
+
+# How many updates we provided along the way
+uint32 updates_sent
+
+---
+# Part 3: the feedback, to be sent periodically by the server during
+# execution.
+#
+# The current generation step
+uint32 generation
+# The number of generations we will use.
+uint32 total_generations

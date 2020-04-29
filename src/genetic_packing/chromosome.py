@@ -1,7 +1,7 @@
 import math
 
 
-class BoxGenom:
+class BoxGenome:
     def __init__(self, box_id, score):
         self.id = box_id
         self.score = score
@@ -13,7 +13,7 @@ class Chromosome:
         self.genes = []
 
     def calculate_box_packing_sequence(self):
-        bps = [BoxGenom(index, score) for (index, score) in enumerate(self.genes[:self.number_of_boxes])]
+        bps = [BoxGenome(index, score) for (index, score) in enumerate(self.genes[:self.number_of_boxes])]
         bps.sort(key=lambda box: box.score)
         return bps
 

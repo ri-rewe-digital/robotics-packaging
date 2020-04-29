@@ -1,17 +1,15 @@
 import queue
 import threading
-
 import time
 
 from genetic_packing.encode import GADecoder
-from genetic_packing.geometry import Cuboid
 from genetic_packing.placer import Placer
 
 
 class PlacerThread(threading.Thread):
-    def __init__(self, id, decoder, placer: Placer, individual_queue, queue_lock):
+    def __init__(self, thread_id, decoder: GADecoder, placer: Placer, individual_queue, queue_lock):
         threading.Thread.__init__(self)
-        self.id = id
+        self.id = thread_id
         self.decoder = decoder
         self.placer = placer
         self.individual_queue = individual_queue
@@ -28,15 +26,14 @@ class PlacerThread(threading.Thread):
                 self.queue_lock.release()
             else:
                 self.queue_lock.release()
+                time.sleep(0.1)
             if individual is not None:
                 self.solutions.append(self.decoder.decode_individual(individual))
 
-            time.sleep(0.1)
-
 
 class MultithreadedGADecoder(GADecoder):
-    def __init__(self, product_boxes, bin_specification: Cuboid, number_of_threads: int):
-        GADecoder.__init__(self, product_boxes, bin_specification)
+    def __init__(self, placer: Placer, number_of_threads: int):
+        GADecoder.__init__(self, placer)
         self.number_of_threads = number_of_threads
 
     def decode_population(self, individuals):
@@ -65,4 +62,3 @@ class MultithreadedGADecoder(GADecoder):
         for worker in worker_threads:
             population.extend(worker.solutions)
         return population
-        # population.append(self.decode_individual(encoder.encode_individual()))

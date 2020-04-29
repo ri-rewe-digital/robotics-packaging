@@ -1,0 +1,13 @@
+<launch>
+
+  <arg name="run_client" default="false" />
+
+  <param name="packing_config_yaml" value="$(find ri_packing)/cfg/packing_config.yaml"/>
+  <node name="packing_server" pkg="ri_packing" type="packing_action_srv.py" output="screen"/>
+
+
+  <group if="$(arg run_client)">
+    <param name="data_file" value="$(find ri_packing)/data/product_boxes.csv"/>
+    <node name="packing_client" pkg="ri_packing" type="packing_action_cl.py" output="screen"/>
+  </group>
+</launch>

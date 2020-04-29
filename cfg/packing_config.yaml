@@ -1,0 +1,12 @@
+population_factor: 1
+elites_percentage: 0.10
+mutants_percentage: 0.15
+inherit_elite_probability: 0.70
+max_generations: 1
+max_generations_no_improvement: 5
+number_of_threads: 10 # set to 0 for single threaded
+delivery_bin_spec: [30, 30, 30]
+placement_strategy: 'bottom' # values are: dftrc, bottom
+bottom:
+  sort_axis: 2
+
